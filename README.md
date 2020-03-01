@@ -4,9 +4,10 @@
 </p>
 
 ## 1.简介
-  [EXE文件网盘链接3-1](https://pan.baidu.com/s/1Ko6P6jvU7c2LEFEa2zg9Pw)  
-  提取码：p2to   
+  [EXE文件网盘链接3-1](https://pan.baidu.com/s/1avhbzuqihQ2DdoegYkVVbQ)  
+  提取码：kpck   
   自己写的针对windows模拟器（支持夜神模拟器及mumu（需管理员模式打开））的游戏脚本，现在能自动接取并完成悬赏及一些蛋疼操作，使用请注册github打个star，可以使用源码二次开发，源码使用请fork，欢迎留言交流。  
+  [明日方舟脚本](https://github.com/vertuer/script_arknight)  
   提示：不推荐星河区使用！
   有疑问及建议可以加QQ2434995342,有空回答相关疑问
 
