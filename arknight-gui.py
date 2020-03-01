@@ -112,7 +112,7 @@ class BaiTan():
             nbr = self.clf.predict(roi_hog_fd)
             value_result = value_result * 10
             value_result += int(nbr[0])
-            save_digits(roi,int(nbr[0]))
+            # save_digits(roi,int(nbr[0]))
         print(value_result)
         return value_result
 
@@ -484,7 +484,7 @@ class MyFrame1(wx.Frame):
         self.infor.SetMaxSize(wx.Size(-1, 400))
         sys.stdout = RedirectText(self.infor)
         self.infor.Bind(wx.EVT_TEXT_MAXLEN,self.TextClear)
-        self.m_hyperlink1 = wx.adv.HyperlinkCtrl(self, wx.ID_ANY, u"使用说明", u"https://github.com/vertuer/script_arknight",
+        self.m_hyperlink1 = wx.adv.HyperlinkCtrl(self, wx.ID_ANY, u"使用说明", u"https://github.com/vertuer/ymjh",
                                                  (110,410), (50,30), wx.adv.HL_DEFAULT_STYLE)
 
 
