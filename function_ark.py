@@ -70,7 +70,7 @@ def confirm_where(handle,pic_data,rgb_bool = True,confirm_once=True):
 
     return exist
 
-def pic_position(handle,pic_data,thresh=None,findall=False,once=False):
+def pic_position(handle,pic_data,thresh=None,findall=False,once=False,time_sleep=2):
     #寻找图像位于模拟器的像素位置，左上为（0，0）
     if thresh==None:
         thresh = globalvar.get_thresh_pic()
@@ -84,7 +84,7 @@ def pic_position(handle,pic_data,thresh=None,findall=False,once=False):
         position = pic_locate(pic_data, im, thresh, findall,rgb_bool=False)
         if position!=None or once==True:
             break
-        time.sleep(2)
+        time.sleep(time_sleep)
         count +=1
         if count>=count_max:
             if count_max ==60:

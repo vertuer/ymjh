@@ -271,7 +271,7 @@ def buy(handle,speed=0.05):
 
 class XsAuto():
     #2020-2-28 修改全选时逻辑
-    def __init__(self,handle,guanqia_list=[],num=10,least_member=3,value=60,xs_min=0):
+    def __init__(self,handle,guanqia_list=[],num=10,least_member=3,value=60,speed=0.15,xs_min=0):
         self.handle = handle
         self.guanqia_list = guanqia_list
         #悬赏总数量
@@ -285,6 +285,7 @@ class XsAuto():
         self.finished_num = 0
         #上一轮接取到的悬赏数量，用来判断完成了多少悬赏
         self.xs_num = 0
+        self.speed = speed
         self.least_member = least_member
         self.value = value
         self.cls_path = "./digits_ymjh3.pkl"
@@ -391,7 +392,7 @@ class XsAuto():
                     function_ark.key_press(self.handle, 'T')
                     time.sleep(1)
                     if self.enter('xs'):
-                        self.xs(self.xs_min,select=self.guanqia_list)
+                        self.xs(self.xs_min,select=self.guanqia_list,speed=self.speed)
                         guanqia = self.enter_guanqia()
                         self.pipei(guanqia)
                         position = function_ark.pic_position(self.handle,config_ark.pic_confirm['fuben'],0.7,once=3)
@@ -407,6 +408,7 @@ class XsAuto():
                             time.sleep(1)
                         else:
                             pass
+                        function_ark.key_press(self.handle,'R')
                         if count%15==0:
                             #防止意外卡死
                             position = function_ark.pic_position(self.handle, config_ark.pic_confirm['fuben'], 0.7,
@@ -429,10 +431,10 @@ class XsAuto():
                         if position != None:
                             if count%10==0:
                                 print("战斗中")
-                        position = function_ark.pic_position(self.handle,config_ark.pic_confirm['jueji'],0.8,once=True)
-                        if position != None:
-                            function_ark.mouse_click(self.handle,position['result'])
-                            print("开大")
+                        # position = function_ark.pic_position(self.handle,config_ark.pic_confirm['jueji'],0.8,once=True)
+                        # if position != None:
+                        #     function_ark.mouse_click(self.handle,position['result'])
+                        #     print("开大")
                         position = function_ark.pic_position(self.handle,config_ark.pic_confirm['use_item'],0.8,once=True)
                         if position != None:
                             function_ark.mouse_click(self.handle,ymjh_point(position['result']))
@@ -606,7 +608,7 @@ class XsAuto():
         return True
 
     # 接受悬赏，并根据设置前往第一个任务目的地
-    def xs(self,min_num=0,select=[]):
+    def xs(self,min_num=0,select=[],speed=0.15):
         def _which(im):
             #返回属于列表中关卡的名称
             guanqia_list = self.guanqia_list
@@ -660,7 +662,7 @@ class XsAuto():
                 # if count ==10:
                 #     position = function_ark.pic_position(handle, config_ark.pic_confirm['xs_taken'])
                 function_ark.mouse_click(self.handle, config_ark.points['xs_update'])
-                time.sleep(0.1)
+                time.sleep(speed)
                 if flag==0:
                     function_ark.mouse_click(self.handle, config_ark.points['xs_update'])
                     time.sleep(0.5)
@@ -925,6 +927,118 @@ class XsAuto():
 #                                     time.sleep(0.5)
 #                                     print("物品价值{}，超出设定单价{}，不购买".format(price,self.unit_price[index]))
 #                     continue
+def relogin(handle):
+    time.sleep(2)
+    function_ark.key_press(handle,'ESC')
+    position = function_ark.pic_position(handle, config_ark.pic_confirm['select_character'],
+                                         once=8)
+    if position != None:
+        # 当前没有装备工具
+        function_ark.mouse_click(handle, ymjh_point(position['result']))
+        position = function_ark.pic_position(handle, config_ark.pic_confirm['confirm'],
+                                             once=8)
+        if position != None:
+            # 当前没有装备工具
+            function_ark.mouse_click(handle, ymjh_point(position['result']))
+        position = function_ark.pic_position(handle, config_ark.pic_confirm['start_game'],
+                                             once=8)
+        if position != None:
+            # 当前没有装备工具
+            function_ark.mouse_click(handle, ymjh_point(position['result']))
+            time.sleep(10)
+            print("避免卡顿，重新进入游戏")
+            return True
+    print("重新进入游戏未知异常")
+    return False
+def caiji(handle,max_line=8):
+    line = 1
+    def _which(handle):
+        position = function_ark.pic_position(handle, config_ark.pic_confirm['cut_wood'],
+                                             once=1)
+        if position!=None:
+            return 'cut_wood'
+        elif function_ark.pic_position(handle, config_ark.pic_confirm['wakuang'],
+                                                 once=1)!=None:
+            return 'wakuang'
+        elif function_ark.pic_position(handle, config_ark.pic_confirm['collect'],
+                                                 once=1)!=None:
+            return 'collect'
+        else:
+            return None
+    labor = _which(handle)
+    if labor==None:
+        print("未检测到生活采集目标，请移动至周围")
+        return False
+    past_t = time.localtime(time.time())
+    past_h, past_m = past_t.tm_hour, past_t.tm_min
+    while(1):
+        tmp_t = time.localtime(time.time())
+        tm_h,tm_m = tmp_t.tm_hour,tmp_t.tm_min
+        if ((tm_h-past_h)*60+(tm_m-past_m))>30:
+            if relogin(handle)==False:
+                return False
+            else:
+                past_t = time.localtime(time.time())
+                past_h,past_m = past_t.tm_hour, past_t.tm_min
+
+        position = function_ark.pic_position(handle, config_ark.pic_confirm['item_obtained'], 0.8, once=True)
+        if position != None:
+            function_ark.mouse_click(handle, ymjh_point(position['result']))
+            print("有获取到物品,叉掉")
+            time.sleep(0.5)
+        position1 = function_ark.pic_position(handle, config_ark.pic_confirm[labor],
+                                             once=4,time_sleep=1)
+        if position1 != None:
+            #可以砍树
+            time.sleep(0.2)
+            position = function_ark.pic_position(handle, config_ark.pic_confirm['no_tool1'],
+                                                 once=True)
+            if position != None:
+                #当前没有装备工具
+                function_ark.mouse_click(handle, ymjh_point(position['result']))
+                print('当前没有装备工具')
+                time.sleep(1)
+                position = function_ark.pic_position(handle, config_ark.pic_confirm['no_tool'],
+                                                     once=True)
+                if position != None:
+                    function_ark.mouse_click(handle, ymjh_point(position['result']))
+                    print('没有工具，现在购买工具')
+                    time.sleep(1)
+                    #判断是狗购买成功
+                    position = function_ark.pic_position(handle, config_ark.pic_confirm['buy'],
+                                                         once=4)
+                    if position != None:
+                        function_ark.mouse_click(handle, ymjh_point(position['result']))
+                        position = function_ark.pic_position(handle, config_ark.pic_confirm['confirm'],
+                                                             once=4)
+                        if position != None:
+                            function_ark.mouse_click(handle, ymjh_point(position['result']))
+                        print('购买完成，开始')
+                        # time.sleep(1)
+
+                else:
+                    #背包中有工具，装备
+                    function_ark.mouse_click(handle,config_ark.points['add_tool'])
+                    time.sleep(0.2)
+            else:
+                pass
+                #可以直接砍树
+            function_ark.mouse_click(handle, ymjh_point(position1['result']))
+            time.sleep(1)
+        else:
+            #当前线没有树，换线
+            function_ark.mouse_click(handle,config_ark.points['channel'])
+            time.sleep(0.5)
+            line += 1
+            if line==(max_line+1):
+                line = 1
+            position = function_ark.pic_position(handle, config_ark.pic_confirm['{}'.format(line)],
+                                                 once=True)
+            if position != None:
+                function_ark.mouse_click(handle, ymjh_point(position['result']))
+                print("切换至{}线".format(line))
+                time.sleep(1)
+
 
 def jueji(handle,skip_list=[3,5]):
     while (1):
@@ -948,7 +1062,7 @@ if __name__ == "__main__":
     handle = get_handle([1280,720],0)                         #获取模拟器窗体句柄
 
     config_ark.pic_load_ram()
-
+    caiji(handle,8)
         # tmp_class.get_item_num(im,0)
         # tmp_class.get_item_num(im,1)
         # tmp_class.get_item_num(im,2)

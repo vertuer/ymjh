@@ -43,5 +43,21 @@ use_item ./ark_images/processed\use_item.png 1340 779
 use_confirm ./ark_images/processed\use_confirm.png 1340 779
 callback ./ark_images/processed\callback.png 1340 779
 zbg ./ark_images/processed\zbg.png 1340 779
-
+1 ./ark_images/processed\digits\1.png 1340 779
+2 ./ark_images/processed\digits\2.png 1340 779
+3 ./ark_images/processed\digits\3.png 1340 779
+4 ./ark_images/processed\digits\4.png 1340 779
+5 ./ark_images/processed\digits\5.png 1340 779
+6 ./ark_images/processed\digits\6.png 1340 779
+7 ./ark_images/processed\digits\7.png 1340 779
+8 ./ark_images/processed\digits\8.png 1340 779
+cut_wood ./ark_images/processed\cut_wood.png 1340 779
+wakuang ./ark_images/processed\wakuang.png 1340 779
+collect ./ark_images/processed\collect.png 1340 779
+no_tool1 ./ark_images/processed\no_tool1.png 1340 779
+no_tool ./ark_images/processed\no_tool.png 1340 779
+select_character ./ark_images/processed\select_character.png 1340 779
+start_game ./ark_images/processed\start_game.png 1340 779
+eat ./ark_images/processed\eat.png 1340 779
+item_obtained ./ark_images/processed\item_obtained.png 1340 779
 

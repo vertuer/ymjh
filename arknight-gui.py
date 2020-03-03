@@ -257,15 +257,16 @@ class RunThreadJue(threading.Thread):
         jueji(self.handle,self.skip_list)
 
 class RunThreadXs(threading.Thread):
-    def __init__(self, handle, guanqia_list,num,least_member,value):
+    def __init__(self, handle, guanqia_list,num,least_member,value,speed=0.15):
         self.handle = handle
         self.guanqia_list = guanqia_list
         self.num = num
         self.least_member = least_member
         self.value = value
+        self.speed = speed
         threading.Thread.__init__(self)
     def run(self):
-        tmp_class = XsAuto(self.handle,self.guanqia_list,self.num,self.least_member,self.value)
+        tmp_class = XsAuto(self.handle,self.guanqia_list,self.num,self.least_member,self.value,self.speed)
         tmp_class.xs(self.num,self.guanqia_list)
 
 class RunThreadBaiTan(threading.Thread):
@@ -282,16 +283,24 @@ class RunThreadBaiTan(threading.Thread):
         tmp_class.total_process(self.time_sleep)
 
 class RunThreadXsAuto(threading.Thread):
-    def __init__(self, handle, guanqia_list, num, least_member, value):
+    def __init__(self, handle, guanqia_list, num, least_member, value,speed=0.15):
         self.handle = handle
         self.guanqia_list = guanqia_list
         self.num = num
         self.least_member = least_member
+        self.speed = speed
         self.value = value
         threading.Thread.__init__(self)
     def run(self):
-        tmp_class = XsAuto(self.handle, self.guanqia_list, self.num, self.least_member, self.value)
+        tmp_class = XsAuto(self.handle, self.guanqia_list, self.num, self.least_member, self.value,self.speed)
         tmp_class.total_process()
+
+class RunThreadCaiJi(threading.Thread):
+    def __init__(self, handle):
+        self.handle = handle
+        threading.Thread.__init__(self)
+    def run(self):
+        caiji(self.handle,8)
 
 class RunThreadTest(threading.Thread):
     def __init__(self):
@@ -465,18 +474,21 @@ class MyFrame1(wx.Frame):
         self.start4 = wx.Button(self, wx.ID_ANY, u"绝学挂机", (140, 280), (80, 35), 0)
         self.end2 = wx.Button(self, wx.ID_ANY, u"停止", (85,290), (45,25), 0)
         self.end3 = wx.Button(self, wx.ID_ANY, u"停止", (220, 290), (45, 25), 0)
-        self.static233 = wx.StaticText(self,wx.ID_ANY,label="集市刷新速度",pos=(75,65),size=(75,25))
-        self.drag_speed = wx.Slider(self, wx.ID_ANY, 5, 0, 5, (65,80), (100,20),
+        self.static233 = wx.StaticText(self,wx.ID_ANY,label="集市刷新速度",pos=(85,65),size=(85,25))
+        self.drag_speed = wx.Slider(self, wx.ID_ANY, 5, 0, 5, (85,80), (80,20),
+                                    wx.SL_HORIZONTAL|wx.SL_INVERSE)
+        self.static2333 = wx.StaticText(self,wx.ID_ANY,label="悬赏刷新速度",pos=(5,65),size=(75,25))
+        self.drag_speed2 = wx.Slider(self, wx.ID_ANY, 3, 2, 6, (5,80), (80,20),
                                     wx.SL_HORIZONTAL|wx.SL_INVERSE)
         # self.drag_speed.SetValue(8)
         # print(self.drag_speed.GetValue())
         self.start5 = wx.Button(self, wx.ID_ANY, u"抢集市", (5,330), (80,35), 0)
         self.end4 = wx.Button(self, wx.ID_ANY, u"停止", (85,340), (45,25), 0)
 
-        self.start5 = wx.Button(self, wx.ID_ANY, u"自动采集", (140,330), (80,35), 0)
-        self.end4 = wx.Button(self, wx.ID_ANY, u"停止", (220,340), (45,25), 0)
+        self.start6 = wx.Button(self, wx.ID_ANY, u"自动采集", (140,330), (80,35), 0)
+        self.end5 = wx.Button(self, wx.ID_ANY, u"停止", (220,340), (45,25), 0)
 
-        self.start6 = wx.Button(self, wx.ID_ANY, u"抢摆摊", (95, 370), (80, 35), 0)
+        self.start7 = wx.Button(self, wx.ID_ANY, u"抢摆摊", (95, 370), (80, 35), 0)
         self.infor = wx.TextCtrl(self, wx.ID_ANY, u"", (5,100), (255,90), wx.TE_MULTILINE|wx.TE_READONLY)
         self.infor.SetMaxLength(200)
         #self.infor.Enable(False)
@@ -502,7 +514,9 @@ class MyFrame1(wx.Frame):
         self.end3.Bind(wx.EVT_BUTTON,self.JueEnd)
         self.start5.Bind(wx.EVT_BUTTON,self.BuyBegin)
         self.end4.Bind(wx.EVT_BUTTON,self.BuyEnd)
-        self.start6.Bind(wx.EVT_BUTTON,self.BaiTan)
+        self.start6.Bind(wx.EVT_BUTTON,self.CaiJiBegin)
+        self.end5.Bind(wx.EVT_BUTTON,self.CaiJiEnd)
+        self.start7.Bind(wx.EVT_BUTTON,self.BaiTan)
         # self.start4.Bind(wx.EVT_BUTTON,self.)
         #初始化操作
         handle = get_handle([1920, 1080])  # 获取模拟器窗体句柄
@@ -602,6 +616,22 @@ class MyFrame1(wx.Frame):
         self.start5.Enable(True)
         self.end4.Enable(False)
         self.start5.SetLabel("抢集市")
+
+    def CaiJiBegin(self, event):
+        self.handle = get_handle()
+        self.start6.Enable(False)
+        self.end5.Enable(True)
+        self.start6.SetLabel("运行中")
+        t = RunThreadCaiJi(self.handle)
+        self.caiji_id = t
+        #t.run() #only for test
+        t.start()
+    def CaiJiEnd(self,evnet):
+        stop_thread(self.caiji_id)
+        self.start6.Enable(True)
+        self.end5.Enable(False)
+        self.start6.SetLabel("自动采集")
+
     def XsBegin(self, event):
         self.handle = get_handle()
         guanqia_list = []
@@ -613,11 +643,12 @@ class MyFrame1(wx.Frame):
             guanqia_list.append('wrg')
         num = int(self.num.GetValue())
         value = int(self.num1.GetValue())
+        speed = int(self.drag_speed2.GetValue())/20
         self.start1.Enable(False)
         self.start2.Enable(False)
         self.end1.Enable(True)
         self.start1.SetLabel("运行中")
-        t = RunThreadXs(self.handle,guanqia_list,num,least_member=4,value=value)
+        t = RunThreadXs(self.handle,guanqia_list,num,least_member=4,value=value,speed=speed)
         self.Xs_id = t
         #t.run() #only for test
         t.start()
@@ -642,11 +673,12 @@ class MyFrame1(wx.Frame):
         num = int(self.num.GetValue())
         value = int(self.num1.GetValue())
         least_member = int(self.zhuxian_num.GetStringSelection())
+        speed = int(self.drag_speed2.GetValue())/20
         self.start1.Enable(False)
         self.start2.Enable(False)
         self.end1.Enable(True)
         self.start2.SetLabel("运行中")
-        t = RunThreadXsAuto(self.handle,guanqia_list,num,least_member,value)
+        t = RunThreadXsAuto(self.handle,guanqia_list,num,least_member,value,speed=speed)
         self.Xs_id = t
         #t.run() #only for test
         t.start()
@@ -673,7 +705,7 @@ class Myapp(wx.App):
         return True
 if __name__ == "__main__":
     #just for test
-    #pyinstaller -F -w --hidden-import=pywt._extensions._cwt --hidden-import=sklearn.svm --hidden-import=sklearn.neighbors.typedefs arknight-gui.py
+
     # handle = get_handle([1280,720],0)                         #获取模拟器窗体句柄
     # config_ark.pic_load_ram()
     # tmp_class = BaiTan(handle,[0 for i in range(6)],[0 for i in range(6)],False)
