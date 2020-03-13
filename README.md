@@ -4,8 +4,8 @@
 </p>
 
 ## 1.简介
-  [EXE文件网盘链接3-3](https://pan.baidu.com/s/1GTmRBCQq0aXUWIKU1LPGdg)  
-  提取码：yil5   
+  [EXE文件网盘链接3-13](https://pan.baidu.com/s/1Um5K-XqvQaN2wOFoIKeUIQ)  
+  提取码：owm6   
   自己写的针对PC端的游戏脚本，现在能自动接取并完成悬赏及一些蛋疼操作，使用请注册github打个star，可以使用源码二次开发，源码使用请fork，欢迎留言交流。  
   [明日方舟脚本](https://github.com/vertuer/script_arknight)  
   有疑问及建议可以加QQ2434995342,有空回答相关疑问
@@ -63,5 +63,6 @@ PIL，pywin32-223，opencv-3.4.3
   1. 添加自动采集功能  
   2. 修复刷本自动绝学只对沧海有效的bug  
   3. 添加了刷新悬赏的自定义间隔设定，若接错悬赏请放缓刷新间隔（往左拉），若对自己的网络和电脑有自信可以拉到最右  
-  
+### （2020-3-13）
+  1. 加入了明月山庄（我玩的服务器刚到130级）  
 
