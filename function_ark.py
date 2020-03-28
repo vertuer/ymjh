@@ -78,7 +78,7 @@ def pic_position(handle,pic_data,thresh=None,findall=False,once=False,time_sleep
     if once != False and once != True:
         count_max = once
     else:
-        count_max = 60
+        count_max = 120
     while(1):
         im = prtsc(handle)
         position = pic_locate(pic_data, im, thresh, findall,rgb_bool=False)
@@ -87,7 +87,7 @@ def pic_position(handle,pic_data,thresh=None,findall=False,once=False,time_sleep
         time.sleep(time_sleep)
         count +=1
         if count>=count_max:
-            if count_max ==60:
+            if count_max ==120:
                 temp_im = Image.fromarray(im)
                 temp_im.save(os.path.join(config_ark.IMG_SAVE,'error_{}.png'.format(
                     time.strftime('%Y-%m-%d-%H-%M-%S',time.localtime(time.time())))))

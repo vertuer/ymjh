@@ -20,9 +20,12 @@ pp_confirm ./ark_images/processed\pp_confirm.png 1340 779
 xyg ./ark_images/processed\xyg.png 1340 779
 wjsz ./ark_images/processed\wjsz.png 1340 779
 wrg ./ark_images/processed\wrg.png 1340 779
+mysz ./ark_images/processed\mysz.png 1340 779
+mysz1 ./ark_images/processed\mysz1.png 1340 779
 xyg_xs ./ark_images/processed\xyg_xs.png 1340 779
 wjsz_xs ./ark_images/processed\wjsz_xs.png 1340 779
 wrg_xs ./ark_images/processed\wrg_xs.png 1340 779
+mysz_xs ./ark_images/processed\mysz_xs.png 1340 779
 reward ./ark_images/processed\reward.png 1340 779
 huodong ./ark_images/processed\huodong.png 1340 779
 xs_enter ./ark_images/processed\xs_enter.png 1340 779
@@ -60,4 +63,11 @@ select_character ./ark_images/processed\select_character.png 1340 779
 start_game ./ark_images/processed\start_game.png 1340 779
 eat ./ark_images/processed\eat.png 1340 779
 item_obtained ./ark_images/processed\item_obtained.png 1340 779
+pipei ./ark_images/processed\pipei.png 1340 779
+pipei_cancel ./ark_images/processed\pipei_cancel.png 1340 779
+return ./ark_images/processed\return.png 1340 779
+naima1 ./ark_images/processed\naima1.png 1340 779
+naima2 ./ark_images/processed\naima2.png 1340 779
+chuairen ./ark_images/processed\chuairen.png 1340 779
+dead ./ark_images/processed\dead.png 1340 779
 

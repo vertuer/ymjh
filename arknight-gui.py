@@ -166,64 +166,86 @@ class BaiTan():
                         result = self.get_item_num(im, index)
                         if result != 0:
                             function_ark.mouse_click(self.handle, config_ark.item_pos[index])
-                            time.sleep(time_sleep)
-                            function_ark.mouse_click(self.handle, config_ark.item_pos[0])
-                            time.sleep(time_sleep)
-                            # whether to buy multiple items
-                            if self.rec:
-                                im = prtsc(self.handle)
-                                price = self.get_item_price(im)
-                            else:
-                                self.unit_price = [1 for i in range(6)]
-                                price = 1
-                            if self.unit_price[index] >= price and price > 0:
-                                # 可以购买 选择最大购买数目
-                                if self.multiple:
-                                    function_ark.mouse_click(self.handle,config_ark.points['num'])
-                                    time.sleep(0.02)
-                                    function_ark.mouse_click(self.handle,config_ark.points['9'])
-                                    time.sleep(0.02)
-                                    function_ark.mouse_click(self.handle, config_ark.points['buy'])
-                                time.sleep(0.02)
-                                function_ark.mouse_click(self.handle, config_ark.points['buy'])
-                                time.sleep(time_sleep)
-                                function_ark.mouse_click(self.handle, config_ark.points['confirm'])
-                                if self.rec:
-                                    time.sleep(5)
-                                    im = prtsc(self.handle)
-                                    cur_money = self.get_bag_money(im)
-                                    bought = (last_money - cur_money) / price
-                                    last_money = cur_money
-                                    if bought > 0:
-                                        print("购买物品{},{}个，价值单价{}".format(index, bought, price))
-                                        self.bought_num[index] += bought
-                                        if index == 0:
-                                            baitan.static16.SetLabel("{}".format(self.bought_num[index]))
-                                        elif index == 1:
-                                            baitan.static26.SetLabel("{}".format(self.bought_num[index]))
-                                        elif index == 2:
-                                            baitan.static36.SetLabel("{}".format(self.bought_num[index]))
-                                        elif index == 3:
-                                            baitan.static46.SetLabel("{}".format(self.bought_num[index]))
-                                        elif index == 4:
-                                            baitan.static56.SetLabel("{}".format(self.bought_num[index]))
-                                        elif index == 5:
-                                            baitan.static66.SetLabel("{}".format(self.bought_num[index]))
-                            else:
-                                position = function_ark.pic_position(self.handle, config_ark.pic_confirm['cancel'],
-                                                                     once=1)
+                            position = function_ark.pic_position(self.handle, config_ark.pic_confirm['return'],
+                                                                 once=10,time_sleep=0.1)
+                            if position != None:
+                                function_ark.mouse_click(self.handle, config_ark.item_pos[0])
+                                position = function_ark.pic_position(self.handle, config_ark.pic_confirm['buy'],
+                                                                     once=10, time_sleep=0.1)
                                 if position != None:
-                                    function_ark.mouse_click(self.handle, ymjh_point(position['result']))
-                                    time.sleep(0.5)
-                                    print("物品价值{}，超出设定单价{}，不购买".format(price, self.unit_price[index]))
+                                    time.sleep(time_sleep)
+                                    # whether to buy multiple items
+                                    if self.rec:
+                                        im = prtsc(self.handle)
+                                        price = self.get_item_price(im)
+                                    else:
+                                        self.unit_price = [1 for i in range(6)]
+                                        price = 1
+                                    if self.unit_price[index] >= price and price > 0:
+                                        # 可以购买 选择最大购买数目
+                                        if self.multiple:
+                                            function_ark.mouse_click(self.handle,config_ark.points['num'])
+                                            time.sleep(0.02)
+                                            function_ark.mouse_click(self.handle,config_ark.points['9'])
+                                            time.sleep(0.01)
+                                            function_ark.mouse_click(self.handle,config_ark.points['9'])
+                                            time.sleep(0.01)
+                                            function_ark.mouse_click(self.handle, ymjh_point(position['result']))
+                                        time.sleep(0.02)
+                                        function_ark.mouse_click(self.handle, ymjh_point(position['result']))
+                                        time.sleep(time_sleep)
+                                        function_ark.mouse_click(self.handle, config_ark.points['confirm'])
+                                        if self.rec:
+                                            time.sleep(5)
+                                            im = prtsc(self.handle)
+                                            cur_money = self.get_bag_money(im)
+                                            bought = (last_money - cur_money) / price
+                                            last_money = cur_money
+                                            if bought > 0:
+                                                print("购买物品{},{}个，价值单价{}".format(index, bought, price))
+                                                self.bought_num[index] += bought
+                                                if index == 0:
+                                                    baitan.static16.SetLabel("{}".format(self.bought_num[index]))
+                                                elif index == 1:
+                                                    baitan.static26.SetLabel("{}".format(self.bought_num[index]))
+                                                elif index == 2:
+                                                    baitan.static36.SetLabel("{}".format(self.bought_num[index]))
+                                                elif index == 3:
+                                                    baitan.static46.SetLabel("{}".format(self.bought_num[index]))
+                                                elif index == 4:
+                                                    baitan.static56.SetLabel("{}".format(self.bought_num[index]))
+                                                elif index == 5:
+                                                    baitan.static66.SetLabel("{}".format(self.bought_num[index]))
+                                    else:
+                                        position = function_ark.pic_position(self.handle, config_ark.pic_confirm['cancel'],
+                                                                             once=2)
+                                        if position != None:
+                                            function_ark.mouse_click(self.handle, ymjh_point(position['result']))
+                                            time.sleep(0.5)
+                                            print("物品价值{}，超出设定单价{}，不购买".format(price, self.unit_price[index]))
 
                         continue
             else:
-                position = function_ark.pic_position(self.handle, config_ark.pic_confirm['zbg'],
-                                                     once=True)
-                if position != None:
-                    function_ark.mouse_click(self.handle,ymjh_point(position['result']))
-                    time.sleep(2)
+                cnt +=1
+                if cnt ==20:
+                    cnt = 0
+                    position = function_ark.pic_position(self.handle, config_ark.pic_confirm['zbg'],
+                                                         once=True)
+                    if position != None:
+                        function_ark.mouse_click(self.handle,ymjh_point(position['result']))
+                        print("意外退出，重新进入珍宝阁")
+                        time.sleep(2)
+                        continue
+                    position = function_ark.pic_position(self.handle, config_ark.pic_confirm['buy'],
+                                                         once=True)
+                    if position != None:
+                        position = function_ark.pic_position(self.handle, config_ark.pic_confirm['cancel'],
+                                                             once=True)
+                        if position != None:
+                            function_ark.mouse_click(self.handle, ymjh_point(position['result']))
+                            print('卡在购买界面，点击取消')
+                            time.sleep(2)
+
 class RedirectText(object):
     def __init__(self,aWxTextCtrl):
         self.out=aWxTextCtrl
@@ -239,6 +261,15 @@ class RunThreadQhb(threading.Thread):
         threading.Thread.__init__(self)
     def run(self):
         qhb(self.handle,self.setting)
+
+class RunThreadDjg(threading.Thread):
+    def __init__(self,handle,num=999):
+        self.handle = handle
+        self.num = num
+        threading.Thread.__init__(self)
+    def run(self):
+        tmp_class = Djg(self.handle,self.num)
+        tmp_class.total_process()
 
 class RunThreadBuy(threading.Thread):
     def __init__(self, handle,speed=0.05):
@@ -257,7 +288,7 @@ class RunThreadJue(threading.Thread):
         jueji(self.handle,self.skip_list)
 
 class RunThreadXs(threading.Thread):
-    def __init__(self, handle, guanqia_list,num,least_member,value,speed=0.15):
+    def __init__(self, handle, guanqia_list,num,least_member,value,speed):
         self.handle = handle
         self.guanqia_list = guanqia_list
         self.num = num
@@ -266,8 +297,8 @@ class RunThreadXs(threading.Thread):
         self.speed = speed
         threading.Thread.__init__(self)
     def run(self):
-        tmp_class = XsAuto(self.handle,self.guanqia_list,self.num,self.least_member,self.value,self.speed)
-        tmp_class.xs(self.num,self.guanqia_list)
+        tmp_class = XsAuto(self.handle,self.speed,self.guanqia_list,self.num,self.least_member,self.value)
+        tmp_class.xs(self.num,self.guanqia_list,self.speed)
 
 class RunThreadBaiTan(threading.Thread):
     def __init__(self, handle, item_num, item_price,time_sleep,multiple=True,rec=True):
@@ -283,24 +314,26 @@ class RunThreadBaiTan(threading.Thread):
         tmp_class.total_process(self.time_sleep)
 
 class RunThreadXsAuto(threading.Thread):
-    def __init__(self, handle, guanqia_list, num, least_member, value,speed=0.15):
+    def __init__(self, handle, guanqia_list, num, least_member, value,speed,num_nai):
         self.handle = handle
         self.guanqia_list = guanqia_list
         self.num = num
+        self.num_nai = num_nai
         self.least_member = least_member
         self.speed = speed
         self.value = value
         threading.Thread.__init__(self)
     def run(self):
-        tmp_class = XsAuto(self.handle, self.guanqia_list, self.num, self.least_member, self.value,self.speed)
+        tmp_class = XsAuto(self.handle,self.speed, self.guanqia_list, self.num, self.least_member, self.value,num_nai=self.num_nai)
         tmp_class.total_process()
 
 class RunThreadCaiJi(threading.Thread):
-    def __init__(self, handle):
+    def __init__(self, handle,relogin):
         self.handle = handle
+        self.relogin = relogin
         threading.Thread.__init__(self)
     def run(self):
-        caiji(self.handle,8)
+        caiji(self.handle,8,self.relogin)
 
 class RunThreadTest(threading.Thread):
     def __init__(self):
@@ -309,7 +342,7 @@ class RunThreadTest(threading.Thread):
     def run(self):
         tmp_class = BaiTan(1, [],[], False)
         tmp_class.test()
-class MyFrame2(wx.Frame):
+class MyFrame3(wx.Frame):
     def __init__(self, parent):
         wx.Frame.__init__(self, parent, id=wx.ID_ANY, title="抢摆摊工具", pos=wx.DefaultPosition,
                           size=wx.Size(260, 440),style=wx.CAPTION | wx.MINIMIZE_BOX | wx.CLOSE_BOX | wx.SYSTEM_MENU)
@@ -419,21 +452,110 @@ class MyFrame2(wx.Frame):
         self.end.Enable(False)
         self.start.SetLabel("启动")
 
+class MyFrame4(wx.Dialog):
+    def __init__(self, parent,team_num,naima_num):
+        wx.Dialog.__init__(self, parent, id=wx.ID_ANY, title="悬赏人数设置详情", pos=wx.DefaultPosition,
+                          size=wx.Size(260, 380),style=wx.CAPTION | wx.MINIMIZE_BOX | wx.CLOSE_BOX | wx.SYSTEM_MENU)
+        numChoices = [u"1", u"2", u"3", u"4", u"5"]
+        numChoices1 = [u"0", u"1", u"2", u"3", u"4"]
+        self.static1 = wx.StaticText(self, wx.ID_ANY, u"咸鱼港", (15, 5), (60, 25), 0)
+        self.static11 = wx.StaticText(self, wx.ID_ANY, u"队伍人数：", (15, 25), (60, 25), 0)
+        self.static12 = wx.Choice(self, wx.ID_ANY, (75, 25), (40, 20), numChoices, 0)
+        self.static12.SetSelection(team_num[0]-1)
+        self.static13 = wx.StaticText(self, wx.ID_ANY, u"奶妈人数：", (15, 50), (60, 25), 0)
+        self.static14 = wx.Choice(self, wx.ID_ANY, (75, 50), (40, 20), numChoices1, 0)
+        self.static14.SetSelection(naima_num[0])
 
+        self.static2 = wx.StaticText(self, wx.ID_ANY, u"万劫山庄", (125, 5), (70, 25), 0)
+        self.static21 = wx.StaticText(self, wx.ID_ANY, u"队伍人数：", (125, 25), (60, 25), 0)
+        self.static22 = wx.Choice(self, wx.ID_ANY, (185, 25), (40, 20), numChoices, 0)
+        self.static22.SetSelection(team_num[1]-1)
+        self.static23 = wx.StaticText(self, wx.ID_ANY, u"奶妈数量：", (125, 50), (60, 25), 0)
+        self.static24 = wx.Choice(self, wx.ID_ANY,(185, 50), (40, 20), numChoices1, 0)
+        self.static24.SetSelection(naima_num[1])
+
+        self.static3 = wx.StaticText(self, wx.ID_ANY, u"无人谷", (15, 105), (90, 25), 0)
+        self.static31 = wx.StaticText(self, wx.ID_ANY, u"队伍人数：", (15, 130), (60, 25), 0)
+        self.static32 = wx.Choice(self, wx.ID_ANY, (75, 130), (40, 20), numChoices, 0)
+        self.static32.SetSelection(team_num[2]-1)
+        self.static33 = wx.StaticText(self, wx.ID_ANY, u"奶妈数量：", (15, 155), (60, 25), 0)
+        self.static34 = wx.Choice(self, wx.ID_ANY,(75, 155), (40, 20), numChoices1, 0)
+        self.static34.SetSelection(naima_num[2])
+
+        self.static4 = wx.StaticText(self, wx.ID_ANY, u"明月山庄", (125, 105), (90, 25), 0)
+        self.static41 = wx.StaticText(self, wx.ID_ANY, u"队伍人数：", (125, 130), (60, 25), 0)
+        self.static42 = wx.Choice(self, wx.ID_ANY, (185, 130), (40, 20), numChoices, 0)
+        self.static42.SetSelection(team_num[3]-1)
+        self.static43 = wx.StaticText(self, wx.ID_ANY, u"奶妈数量：", (125, 155), (60, 25), 0)
+        self.static44 = wx.Choice(self, wx.ID_ANY,(185, 155), (40, 20), numChoices1, 0)
+        self.static44.SetSelection(naima_num[3])
+
+        self.static5 = wx.StaticText(self, wx.ID_ANY, u"暂定", (15, 205), (90, 25), 0)
+        self.static51 = wx.StaticText(self, wx.ID_ANY, u"队伍人数：", (15, 230), (60, 25), 0)
+        self.static52 = wx.Choice(self, wx.ID_ANY, (75, 230), (40, 20), numChoices, 0)
+        self.static52.SetSelection(team_num[3]-1)
+        self.static53 = wx.StaticText(self, wx.ID_ANY, u"奶妈数量：", (15, 255), (60, 25), 0)
+        self.static54 = wx.Choice(self, wx.ID_ANY,(75, 255), (40, 20), numChoices1, 0)
+        self.static54.SetSelection(naima_num[3])
+
+        self.static6 = wx.StaticText(self, wx.ID_ANY, u"暂定", (125, 205), (90, 25), 0)
+        self.static61 = wx.StaticText(self, wx.ID_ANY, u"队伍人数：", (125, 230), (60, 25), 0)
+        self.static62 = wx.Choice(self, wx.ID_ANY, (185, 230), (40, 20), numChoices, 0)
+        self.static62.SetSelection(team_num[3]-1)
+        self.static63 = wx.StaticText(self, wx.ID_ANY, u"奶妈人数：", (125, 255), (60, 25), 0)
+        self.static64 = wx.Choice(self, wx.ID_ANY,(185, 255), (40, 20), numChoices1, 0)
+        self.static64.SetSelection(naima_num[3])
+        self.start = wx.Button(self, wx.ID_OK,label="保存",pos=(30,300),size=(60,30))
+        self.end = wx.Button(self, wx.ID_CANCEL,label="关闭",pos=(150,300),size=(60,30))
+        # self.start.Bind(wx.EVT_BUTTON,self.SettingSave)
+        # self.end.Bind(wx.EVT_BUTTON,self.BaiTanEnd)
+
+    # def SettingSave(self,event):
+    #     handle = get_handle()
+    #     self.party_num = []
+    #     self.naima_num = []
+    #     self.party_num.append(int(self.static12.GetValue()))
+    #     self.naima_num.append(int(self.static14.GetValue()))
+    #     self.party_num.append(int(self.static22.GetValue()))
+    #     self.naima_num.append(int(self.static24.GetValue()))
+    #     self.party_num.append(int(self.static32.GetValue()))
+    #     self.naima_num.append(int(self.static34.GetValue()))
+    #     self.party_num.append(int(self.static42.GetValue()))
+    #     self.naima_num.append(int(self.static44.GetValue()))
+    #     # tmp_class = self.BaiTan(handle,item_price,item_num,False)
+    #     # tmp_class
+    #     self.start.Enable(False)
+    #     self.end.Enable(True)
+    #     self.start.SetLabel("运行中")
+    #     # print(time_sleep)
+    #     # t = RunThreadBaiTan(handle,item_num,item_price,time_sleep,multiple,rec)
+    #     # self.baitan_id = t
+    #     # # t.run() #only for test
+    #     # t.start()
+    # def BaiTanEnd(self,event):
+    #     stop_thread(self.baitan_id)
+    #     self.start.Enable(True)
+    #     self.end.Enable(False)
+    #     self.start.SetLabel("启动")
 
 class MyFrame1(wx.Frame):
     def __init__(self, parent):
         wx.Frame.__init__(self, parent, id=wx.ID_ANY, title=wx.EmptyString, pos=wx.DefaultPosition,
-                          size=wx.Size(290, 470), style=wx.DEFAULT_FRAME_STYLE | wx.TAB_TRAVERSAL)
+                          size=wx.Size(290, 495), style=wx.DEFAULT_FRAME_STYLE | wx.TAB_TRAVERSAL)
+        self.team_num = [3,3,3,4] #队伍人数设置
+        self.naima_num = [0,0,1,1] #奶妈人数设置
+
         self.SIZE1 = (100,30)
         self.SetSizeHintsSz(wx.DefaultSize, wx.DefaultSize)
         self.cbox1 = wx.CheckBox(self,wx.ID_ANY,label="羡鱼港",pos=(5,15),size=(50,20))
         self.cbox2 = wx.CheckBox(self, wx.ID_ANY, label="万劫山庄", pos=(70, 15), size=(70, 20))
         self.cbox3 = wx.CheckBox(self, wx.ID_ANY, label="无人谷", pos=(5, 45), size=(50, 20))
-        self.cbox4 = wx.CheckBox(self, wx.ID_ANY, label="全选", pos=(70, 45), size=(50, 20))
+        self.cbox4 = wx.CheckBox(self, wx.ID_ANY, label="明月", pos=(70, 45), size=(50, 20))
+        self.cboxtmp = wx.CheckBox(self, wx.ID_ANY, label="全选", pos=(120, 45), size=(40, 20))
         self.cbox1.SetValue(True)
         self.cbox2.SetValue(True)
         self.cbox3.SetValue(True)
+        self.cbox4.SetValue(True)
         self.static1 = wx.StaticText(self, wx.ID_ANY, u"悬赏次数", (165,15), (55,25), 0)
         self.static1.Wrap(-1)
         self.num = wx.TextCtrl(self, wx.ID_ANY, u"10", (220,10), (40,25), 0)
@@ -442,67 +564,76 @@ class MyFrame1(wx.Frame):
         self.static2.Wrap(-1)
         self.num1 = wx.TextCtrl(self, wx.ID_ANY, u"60", (220,40), (40,25), 0)
         self.num1.SetMaxLength(0)
-        self.static3 = wx.StaticText(self, wx.ID_ANY, u"队伍人数", (165,75), (55,25), 0)
-        self.static3.Wrap(-1)
-        zhuxian_numChoices = [u"1", u"2", u"3", u"4", u"5"]
-        self.zhuxian_num = wx.Choice(self, wx.ID_ANY, (220,70), (40,20), zhuxian_numChoices, 0)
-        self.zhuxian_num.SetSelection(3)
+        self.setting_ctr = wx.Button(self, wx.ID_ANY, u"队伍人数设置", (165,80), (80,30), 0)
+        # self.static3 = wx.StaticText(self, wx.ID_ANY, u"队伍人数", (165,75), (55,25), 0)
+        # self.static3.Wrap(-1)
+        # zhuxian_numChoices = [u"1", u"2", u"3", u"4", u"5"]
+        # self.zhuxian_num = wx.Choice(self, wx.ID_ANY, (220,70), (40,20), zhuxian_numChoices, 0)
+        # self.zhuxian_num.SetSelection(3)
+        # self.static4 = wx.StaticText(self, wx.ID_ANY, u"奶妈人数", (165,100), (55,25), 0)
+        # self.static4.Wrap(-1)
+        # naima_numChoices = [u"0", u"1", u"2", u"3", u"4"]
+        # self.naima_num = wx.Choice(self, wx.ID_ANY, (220,95), (40,20), naima_numChoices, 0)
+        # self.naima_num.SetSelection(0)
 
-        self.start1 = wx.Button(self, wx.ID_ANY, u"仅接悬赏", (5,195), (80,35), 0)
-        self.start2 = wx.Button(self, wx.ID_ANY, u"自动悬赏", (87,195), (80,35), 0)
-        self.end1 = wx.Button(self, wx.ID_ANY, u"停止", (170,195), (90,35), 0)
+        self.start1 = wx.Button(self, wx.ID_ANY, u"仅接悬赏", (5,220), (80,35), 0)
+        self.start2 = wx.Button(self, wx.ID_ANY, u"自动悬赏", (87,220), (80,35), 0)
+        self.end1 = wx.Button(self, wx.ID_ANY, u"停止", (170,220), (90,35), 0)
 
-        self.cbox5 = wx.CheckBox(self,wx.ID_ANY,label="1",pos=(5,235),size=(30,20))
+        self.cbox5 = wx.CheckBox(self,wx.ID_ANY,label="1",pos=(5,260),size=(30,20))
         self.cbox5.SetValue(True)
-        self.cbox6 = wx.CheckBox(self,wx.ID_ANY,label="2",pos=(65,235),size=(30,20))
+        self.cbox6 = wx.CheckBox(self,wx.ID_ANY,label="2",pos=(65,260),size=(30,20))
         # self.cbox6.SetValue(True)
-        self.cbox7 = wx.CheckBox(self,wx.ID_ANY,label="3",pos=(125,235),size=(30,20))
+        self.cbox7 = wx.CheckBox(self,wx.ID_ANY,label="3",pos=(125,260),size=(30,20))
         self.cbox7.SetValue(True)
-        self.cbox8 = wx.CheckBox(self,wx.ID_ANY,label="4",pos=(185,235),size=(30,20))
+        self.cbox8 = wx.CheckBox(self,wx.ID_ANY,label="4",pos=(185,260),size=(30,20))
         # self.cbox8.SetValue(True)
-        self.cbox9 = wx.CheckBox(self,wx.ID_ANY,label="5",pos=(5,255),size=(30,20))
+        self.cbox9 = wx.CheckBox(self,wx.ID_ANY,label="5",pos=(5,280),size=(30,20))
         self.cbox9.SetValue(True)
-        self.cbox10 = wx.CheckBox(self,wx.ID_ANY,label="6",pos=(65,255),size=(30,20))
+        self.cbox10 = wx.CheckBox(self,wx.ID_ANY,label="6",pos=(65,280),size=(30,20))
         self.cbox10.SetValue(True)
-        self.cbox11 = wx.CheckBox(self,wx.ID_ANY,label="7",pos=(125,255),size=(30,20))
+        self.cbox11 = wx.CheckBox(self,wx.ID_ANY,label="7",pos=(125,280),size=(30,20))
         self.cbox11.SetValue(True)
-        self.cbox12 = wx.CheckBox(self,wx.ID_ANY,label="8",pos=(185,255),size=(30,20))
+        self.cbox12 = wx.CheckBox(self,wx.ID_ANY,label="8",pos=(185,280),size=(30,20))
         self.cbox12.SetValue(True)
-        self.cbox13 = wx.CheckBox(self,wx.ID_ANY,label="全选",pos=(225,255),size=(50,20))
+        self.cbox13 = wx.CheckBox(self,wx.ID_ANY,label="全选",pos=(225,280),size=(40,20))
         self.cbox13.SetValue(False)
-        self.start3 = wx.Button(self, wx.ID_ANY, u"抢红包", (5,280), (80,35), 0)
-        self.start4 = wx.Button(self, wx.ID_ANY, u"绝学挂机", (140, 280), (80, 35), 0)
-        self.end2 = wx.Button(self, wx.ID_ANY, u"停止", (85,290), (45,25), 0)
-        self.end3 = wx.Button(self, wx.ID_ANY, u"停止", (220, 290), (45, 25), 0)
-        self.static233 = wx.StaticText(self,wx.ID_ANY,label="集市刷新速度",pos=(85,65),size=(85,25))
-        self.drag_speed = wx.Slider(self, wx.ID_ANY, 5, 0, 5, (85,80), (80,20),
+        self.start3 = wx.Button(self, wx.ID_ANY, u"抢红包", (5,305), (80,35), 0)
+        self.start4 = wx.Button(self, wx.ID_ANY, u"绝学挂机", (140, 305), (80, 35), 0)
+        self.end2 = wx.Button(self, wx.ID_ANY, u"停止", (85,315), (45,25), 0)
+        self.end3 = wx.Button(self, wx.ID_ANY, u"停止", (220, 315), (45, 25), 0)
+        self.static233 = wx.StaticText(self,wx.ID_ANY,label="集市刷新速度",pos=(85,70),size=(75,20))
+        self.drag_speed = wx.Slider(self, wx.ID_ANY, 5, 0, 5, (85,95), (80,20),
                                     wx.SL_HORIZONTAL|wx.SL_INVERSE)
-        self.static2333 = wx.StaticText(self,wx.ID_ANY,label="悬赏刷新速度",pos=(5,65),size=(75,25))
-        self.drag_speed2 = wx.Slider(self, wx.ID_ANY, 3, 2, 6, (5,80), (80,20),
+        self.static2333 = wx.StaticText(self,wx.ID_ANY,label="悬赏刷新速度",pos=(5,70),size=(75,20))
+        self.drag_speed2 = wx.Slider(self, wx.ID_ANY, 4, 2, 8, (5,95), (80,20),
                                     wx.SL_HORIZONTAL|wx.SL_INVERSE)
         # self.drag_speed.SetValue(8)
         # print(self.drag_speed.GetValue())
-        self.start5 = wx.Button(self, wx.ID_ANY, u"抢集市", (5,330), (80,35), 0)
-        self.end4 = wx.Button(self, wx.ID_ANY, u"停止", (85,340), (45,25), 0)
+        self.start5 = wx.Button(self, wx.ID_ANY, u"抢集市", (5,355), (80,35), 0)
+        self.end4 = wx.Button(self, wx.ID_ANY, u"停止", (85,365), (45,25), 0)
 
-        self.start6 = wx.Button(self, wx.ID_ANY, u"自动采集", (140,330), (80,35), 0)
-        self.end5 = wx.Button(self, wx.ID_ANY, u"停止", (220,340), (45,25), 0)
-
-        self.start7 = wx.Button(self, wx.ID_ANY, u"抢摆摊", (95, 370), (80, 35), 0)
-        self.infor = wx.TextCtrl(self, wx.ID_ANY, u"", (5,100), (255,90), wx.TE_MULTILINE|wx.TE_READONLY)
-        self.infor.SetMaxLength(200)
+        self.start6 = wx.Button(self, wx.ID_ANY, u"自动采集", (140,355), (80,35), 0)
+        self.end5 = wx.Button(self, wx.ID_ANY, u"停止", (220,365), (45,25), 0)
+        self.cbox233 = wx.CheckBox(self,wx.ID_ANY,label="重登防卡",pos=(190,395),size=(75,20))
+        self.cbox233.SetValue(False)
+        self.start7 = wx.Button(self, wx.ID_ANY, u"抢摆摊", (95, 395), (80, 35), 0)
+        self.start8 = wx.Button(self, wx.ID_ANY, u"登剑阁", (5, 395), (80, 35), 0)
+        self.infor = wx.TextCtrl(self, wx.ID_ANY, u"", (5,125), (255,90), wx.TE_MULTILINE|wx.TE_READONLY)
+        self.infor.SetMaxLength(400)
         #self.infor.Enable(False)
         self.infor.SetMinSize(wx.Size(-1, 80))
         self.infor.SetMaxSize(wx.Size(-1, 400))
+        #更换引流控件
         sys.stdout = RedirectText(self.infor)
         self.infor.Bind(wx.EVT_TEXT_MAXLEN,self.TextClear)
         self.m_hyperlink1 = wx.adv.HyperlinkCtrl(self, wx.ID_ANY, u"使用说明", u"https://github.com/vertuer/ymjh",
-                                                 (110,410), (50,30), wx.adv.HL_DEFAULT_STYLE)
+                                                 (110,435), (50,30), wx.adv.HL_DEFAULT_STYLE)
 
 
 
         #Connect Events
-        self.cbox4.Bind(wx.EVT_CHECKBOX,self.ChooseAll1)
+        self.cboxtmp.Bind(wx.EVT_CHECKBOX,self.ChooseAll1)
         self.cbox13.Bind(wx.EVT_CHECKBOX,self.ChooseAll2)
         self.start1.Bind(wx.EVT_BUTTON,self.XsBegin)
         self.start2.Bind(wx.EVT_BUTTON,self.XsAutoBegin)
@@ -517,6 +648,8 @@ class MyFrame1(wx.Frame):
         self.start6.Bind(wx.EVT_BUTTON,self.CaiJiBegin)
         self.end5.Bind(wx.EVT_BUTTON,self.CaiJiEnd)
         self.start7.Bind(wx.EVT_BUTTON,self.BaiTan)
+        self.start8.Bind(wx.EVT_BUTTON,self.DjgBegin)
+        self.setting_ctr.Bind(wx.EVT_BUTTON,self.SetTeam)
         # self.start4.Bind(wx.EVT_BUTTON,self.)
         #初始化操作
         handle = get_handle([1920, 1080])  # 获取模拟器窗体句柄
@@ -525,14 +658,16 @@ class MyFrame1(wx.Frame):
             wx.Exit()
         self.handle = handle
     def ChooseAll1(self,event):
-        if self.cbox4.GetValue()==True:
+        if self.cboxtmp.GetValue()==True:
             self.cbox1.SetValue(True)
             self.cbox2.SetValue(True)
             self.cbox3.SetValue(True)
+            self.cbox4.SetValue(True)
         else:
             self.cbox1.SetValue(False)
             self.cbox2.SetValue(False)
             self.cbox3.SetValue(False)
+            self.cbox4.SetValue(False)
     def ChooseAll2(self,event):
         if self.cbox13.GetValue()==True:
             self.cbox5.SetValue(True)
@@ -556,6 +691,29 @@ class MyFrame1(wx.Frame):
         pass
     def TextClear(self,event):
         self.infor.Clear()
+    def SetTeam(self,event):
+        SetTeam = MyFrame4(None,self.team_num,self.naima_num)
+        result = SetTeam.ShowModal()
+        if result == wx.ID_OK:
+            #handle = get_handle()
+            party_num = []
+            naima_num = []
+            party_num.append(int(SetTeam.static12.GetStringSelection()))
+            naima_num.append(int(SetTeam.static14.GetStringSelection()))
+            party_num.append(int(SetTeam.static22.GetStringSelection()))
+            naima_num.append(int(SetTeam.static24.GetStringSelection()))
+            party_num.append(int(SetTeam.static32.GetStringSelection()))
+            naima_num.append(int(SetTeam.static34.GetStringSelection()))
+            party_num.append(int(SetTeam.static42.GetStringSelection()))
+            naima_num.append(int(SetTeam.static44.GetStringSelection()))
+            self.team_num = party_num
+            self.naima_num = naima_num
+            # print(self.team_num)
+            # print(self.naima_num)
+
+        elif result == wx.ID_CANCEL:
+            pass
+        SetTeam.Destroy()
     def QhbBegin(self, event):
         self.handle = get_handle()
         self.start3.Enable(False)
@@ -565,6 +723,18 @@ class MyFrame1(wx.Frame):
         self.qhb_id = t
         #t.run() #only for test
         t.start()
+
+    def DjgBegin(self, event):
+        if self.start8.GetLabel()=="正在运行中":
+            stop_thread(self.djg_id)
+            self.start8.SetLabel("登剑阁")
+        else:
+            self.handle = get_handle()
+            self.start8.SetLabel("正在运行中")
+            t = RunThreadDjg(self.handle)
+            self.djg_id = t
+            #t.run() #only for test
+            t.start()
     def QhbEnd(self,evnet):
         stop_thread(self.qhb_id)
         self.start3.Enable(True)
@@ -616,13 +786,13 @@ class MyFrame1(wx.Frame):
         self.start5.Enable(True)
         self.end4.Enable(False)
         self.start5.SetLabel("抢集市")
-
     def CaiJiBegin(self, event):
         self.handle = get_handle()
         self.start6.Enable(False)
         self.end5.Enable(True)
         self.start6.SetLabel("运行中")
-        t = RunThreadCaiJi(self.handle)
+        relogin = self.cbox233.GetValue()
+        t = RunThreadCaiJi(self.handle,relogin)
         self.caiji_id = t
         #t.run() #only for test
         t.start()
@@ -631,7 +801,6 @@ class MyFrame1(wx.Frame):
         self.start6.Enable(True)
         self.end5.Enable(False)
         self.start6.SetLabel("自动采集")
-
     def XsBegin(self, event):
         self.handle = get_handle()
         guanqia_list = []
@@ -639,11 +808,14 @@ class MyFrame1(wx.Frame):
             guanqia_list.append('xyg')
         if self.cbox2.GetValue()==True:
             guanqia_list.append('wjsz')
-        if self.cbox1.GetValue()==True:
+        if self.cbox3.GetValue()==True:
             guanqia_list.append('wrg')
+        if self.cbox4.GetValue()==True:
+            guanqia_list.append('mysz')
         num = int(self.num.GetValue())
         value = int(self.num1.GetValue())
-        speed = int(self.drag_speed2.GetValue())/20
+        speed = int(self.drag_speed2.GetValue())/40
+        # print("当前延迟{}s".format(speed))
         self.start1.Enable(False)
         self.start2.Enable(False)
         self.end1.Enable(True)
@@ -670,25 +842,39 @@ class MyFrame1(wx.Frame):
             guanqia_list.append('wjsz')
         if self.cbox3.GetValue()==True:
             guanqia_list.append('wrg')
+        if self.cbox4.GetValue()==True:
+            guanqia_list.append('mysz')
         num = int(self.num.GetValue())
         value = int(self.num1.GetValue())
-        least_member = int(self.zhuxian_num.GetStringSelection())
-        speed = int(self.drag_speed2.GetValue())/20
+        least_member = self.team_num
+        num_nai = self.naima_num
+        speed = int(self.drag_speed2.GetValue())/40
+        # print("当前延迟{}s".format(speed))
         self.start1.Enable(False)
         self.start2.Enable(False)
         self.end1.Enable(True)
         self.start2.SetLabel("运行中")
-        t = RunThreadXsAuto(self.handle,guanqia_list,num,least_member,value,speed=speed)
+        t = RunThreadXsAuto(self.handle,guanqia_list,num,least_member,value,speed=speed,num_nai=num_nai)
         self.Xs_id = t
         #t.run() #only for test
         t.start()
 
     def BaiTan(self,event):
         global baitan
-        baitan = MyFrame2(parent=None)
+        baitan = MyFrame3(parent=None)
         baitan.Show()
     # def OnClose(self,event):
     #     self.ExitMainLoop()
+
+class SubclassDialog(wx.Dialog):
+    def __init__(self):
+        wx.Dialog.__init__(self, None, -1, '请选择脚本功能',
+                           size=(300, 100))
+        okButton = wx.Button(self, wx.ID_OK, "脚本挂机", pos=(15, 15))
+        okButton.SetDefault()
+        cancelButton = wx.Button(self, wx.ID_CANCEL, "脚本关卡管理",
+                                 pos=(115, 15))
+
 class Myapp(wx.App):
     def __init__(self):
         #self.qwe = 123
@@ -700,9 +886,23 @@ class Myapp(wx.App):
     def OnInit(self):
         #print(self.qwe)
         self.frame1 = MyFrame1(parent=None)
-        config_ark.pic_load_ram()  # 将配置文件中的图像载入内存
-        self.frame1.Show()
+        self.frame2 = MyFrame2(parent=None)
+        self.frame1.Bind(wx.EVT_CLOSE,self.OnClose)
+        self.frame2.Bind(wx.EVT_CLOSE,self.OnClose)
+        dialog = SubclassDialog()
+        result = dialog.ShowModal()
+        dialog.Destroy()
+        if result == wx.ID_OK:
+            #handle = get_handle()
+            config_ark.pic_load_ram()  # 将配置文件中的图像载入内存
+            #self.SetTopWindow(self.frame1)
+            self.frame1.Show()
+
+        elif result == wx.ID_CANCEL:
+            #self.SetTopWindow(self.frame2)
+            self.frame2.Show()
         return True
+
 if __name__ == "__main__":
     #just for test
 

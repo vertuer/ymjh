@@ -3,6 +3,7 @@ import time
 from PIL import Image
 import numpy as np
 import aircv
+import win32print
 # import skimage.io as io
 # import re
 import globalvar
@@ -76,7 +77,7 @@ def mouse_click(handle,xy):
     # x,y = win32gui.ScreenToClient(handle,(x,y))
     win32gui.SendMessage(handle,win32con.WM_LBUTTONDOWN,win32con.MK_LBUTTON, pos(x,y))
     # win32gui.PostMessage(handle,win32con.WM_LBUTTONDBLCLK,win32con.MK_LBUTTON, win32api.MAKELONG(x,y))
-    time.sleep(0.05)
+    time.sleep(0.02)
     # win32gui.SendMessage(handle, win32con.WM_MOUSELEAVE, win32con.MK_LBUTTON, pos(x,y))
     win32gui.SendMessage(handle, win32con.WM_LBUTTONUP,0, pos(x,y))
 
@@ -141,12 +142,18 @@ def TestEnumWindows():
     return windows
 
 def prtsc(handle): #returns the im of the printed software
-    left, top, right, bot = win32gui.GetWindowRect(handle)
-    w = right - left
-    h = bot - top
-    # 返回句柄窗口的设备环境、覆盖整个窗口，包括非客户区，标题栏，菜单，边框
+    defalut_xdpi = 96
+    default_ydpi = 96
     hwndDC = win32gui.GetWindowDC(handle)
     # 创建设备描述表
+    # x_dpi = win32print.GetDeviceCaps(hwndDC, 88)
+    # y_dpi = win32print.GetDeviceCaps(hwndDC, 90)
+    left, top, right, bot = win32gui.GetWindowRect(handle)
+    # w = int((right - left) * (x_dpi/defalut_xdpi))
+    # h = int((bot - top) * (y_dpi/default_ydpi))
+    w = int((right - left))
+    h = int((bot - top))
+    # 返回句柄窗口的设备环境、覆盖整个窗口，包括非客户区，标题栏，菜单，边框
     mfcDC = win32ui.CreateDCFromHandle(hwndDC)
     # 创建内存设备描述表
     saveDC = mfcDC.CreateCompatibleDC()
@@ -250,11 +257,23 @@ def get_handle(resolution=[1920,1080],order=0,sim="ANY"): #now only the 夜神 i
     #     except:
     #         return -1
     
-    rect = win32gui.GetWindowRect(win)
-
-    globalvar.set_window_resolution([rect[2]-rect[0],rect[3]-rect[1]])
-    print("当前窗体大小为{}x{}".format(rect[2]-rect[0],rect[3]-rect[1]))
-    if (rect[2] - rect[0])==resolution[0] and (rect[3] - rect[1])==resolution[1]:
+    # rect = win32gui.GetWindowRect(win)
+    hwndDC = win32gui.GetDC(0)
+    defalut_xdpi = 96
+    default_ydpi = 96
+    # 创建设备描述表
+    x_dpi = win32print.GetDeviceCaps(hwndDC, win32con.LOGPIXELSX)
+    y_dpi = win32print.GetDeviceCaps(hwndDC, win32con.LOGPIXELSY)
+    print("x轴dpi{}".format(x_dpi))
+    print("y轴dpi{}".format(y_dpi))
+    left, top, right, bot = win32gui.GetWindowRect(win)
+    # w = int((right - left) * (x_dpi/defalut_xdpi))
+    # h = int((bot - top) * (y_dpi/default_ydpi))
+    w = int((right - left))
+    h = int((bot - top))
+    globalvar.set_window_resolution([w,h])
+    print("当前窗体大小为{}x{}".format(w,h))
+    if w==resolution[0] and h==resolution[1]:
         pass
     else:
         #print('resolution isn\'t {}p'.format(resolution[1]))

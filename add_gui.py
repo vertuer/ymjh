@@ -321,39 +321,39 @@ class MyFrame1(wx.Frame):
         #     # cv2.waitKey()
         # print(value_result)
 
-        point1, point2, point3, point4 = config_ark.yinliang_pos
-        im_crop = im[point2 - config_ark.ymjh_pc_shift[1]:point4 - config_ark.ymjh_pc_shift[1], point1 - config_ark.ymjh_pc_shift[0]:point3 - config_ark.ymjh_pc_shift[0], :]
-        thresh = [[120,200], [120,200], [120,200]]  # RGB
-        im_gray = cv2.cvtColor(im_crop.copy(), cv2.COLOR_BGR2GRAY)
-        im_thresh = threshhold(im_crop.copy(), thresh)
-        im_thresh = cv2.cvtColor(im_thresh.copy(), cv2.COLOR_BGR2GRAY)
-        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (2, 2))
-        # im_dilated = cv2.dilate(im_thresh, (3, 3))
-        im_erode = cv2.erode(im_thresh, kernel)
-        cv2.imshow("123", im_thresh)
-        cv2.waitKey()
-        results = cfs(im_erode)
-        value_result = 0
-        for rect in results:
-            roi1 = im_gray[rect[2]:rect[3], rect[0]:rect[1]]
-            # roi = np.transpose(roi,(1,0))
-            roi = fillout(roi1)
-            if isinstance(roi, np.ndarray) == False:
-                continue
-            roi_hog_fd = hog(roi.copy(), orientations=9, pixels_per_cell=(14, 14), cells_per_block=(1, 1),
-                             visualise=False)
-            roi_hog_fd = self.pp.transform(np.array([roi_hog_fd], 'float64'))
-            nbr = self.clf.predict(roi_hog_fd)
-            value_result = value_result * 10
-            value_result += int(nbr[0])
-            save_digits(roi,int(nbr[0]))
-            # cv2.imshow("123",roi1)
-            # cv2.waitKey()
-        print("当前银两{}".format(value_result))
-
-
-        self.scoreText8.SetLabel("{}".format(value_result))
-        results = pic_locate(match_im,im,0.8,True,True)
+        # point1, point2, point3, point4 = config_ark.yinliang_pos
+        # im_crop = im[point2 - config_ark.ymjh_pc_shift[1]:point4 - config_ark.ymjh_pc_shift[1], point1 - config_ark.ymjh_pc_shift[0]:point3 - config_ark.ymjh_pc_shift[0], :]
+        # thresh = [[120,200], [120,200], [120,200]]  # RGB
+        # im_gray = cv2.cvtColor(im_crop.copy(), cv2.COLOR_BGR2GRAY)
+        # im_thresh = threshhold(im_crop.copy(), thresh)
+        # im_thresh = cv2.cvtColor(im_thresh.copy(), cv2.COLOR_BGR2GRAY)
+        # kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (2, 2))
+        # # im_dilated = cv2.dilate(im_thresh, (3, 3))
+        # im_erode = cv2.erode(im_thresh, kernel)
+        # cv2.imshow("123", im_thresh)
+        # cv2.waitKey()
+        # results = cfs(im_erode)
+        # value_result = 0
+        # for rect in results:
+        #     roi1 = im_gray[rect[2]:rect[3], rect[0]:rect[1]]
+        #     # roi = np.transpose(roi,(1,0))
+        #     roi = fillout(roi1)
+        #     if isinstance(roi, np.ndarray) == False:
+        #         continue
+        #     roi_hog_fd = hog(roi.copy(), orientations=9, pixels_per_cell=(14, 14), cells_per_block=(1, 1),
+        #                      visualise=False)
+        #     roi_hog_fd = self.pp.transform(np.array([roi_hog_fd], 'float64'))
+        #     nbr = self.clf.predict(roi_hog_fd)
+        #     value_result = value_result * 10
+        #     value_result += int(nbr[0])
+        #     save_digits(roi,int(nbr[0]))
+        #     # cv2.imshow("123",roi1)
+        #     # cv2.waitKey()
+        # print("当前银两{}".format(value_result))
+        #
+        #
+        # self.scoreText8.SetLabel("{}".format(value_result))
+        results = pic_locate(match_im,im,0.6,True,False)
         if results:
             for i in results:
                 pos = i['rectangle'][0]
