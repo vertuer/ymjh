@@ -26,7 +26,20 @@ yinliang_pos = [497,12,590,35]
 baitan_pos = [[557,262,600,283],[894,262,949,284],[557,367,611,394],[893,367,953,395],
               [554,475,602,499],[892,475,938,501]]
 drag_left = [[580,539],[880,543]]
-xuanshang_pos = [[425,409,471,438],[656,409,706,438],[888,409,939,438],[1120,409,1166,438]]
+xuanshang_pos = []
+with open(os.path.join(CONFIG_PATH, "points"), 'r', encoding='utf-8') as file:
+    while (1):
+        tmp = file.readline()
+        if tmp in ['\n', ' ']:
+            continue
+        if not tmp:
+            break
+        tmp = tmp.split(' ')
+        position = []
+        for j in tmp:
+            position.append(int(j))
+        xuanshang_pos.append(position)
+file.close()
 xuanshang_name = [[305,230,460,580],[547,233,683,580],[781,233,910,580]]
 xuanshang_take = [[384,523],[609,521],[845,529],[1065,518]]
 duiwu_pos = [None,[443,221],None,None,[1090,227]]

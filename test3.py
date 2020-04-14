@@ -316,6 +316,8 @@ class Djg():
 class XsAuto():
     #2020-2-28 修改全选时逻辑
     def __init__(self,handle,speed,guanqia_list=[],num=10,least_member=3,value=60,xs_min=0,num_nai=0):
+        self.stuck_set = 1200
+        #20分钟卡死检测，如果卡死一个位置20分钟退队重组
         self.handle = handle
         self.log_file = "./log.txt"
         self.guanqia_list = guanqia_list
@@ -337,6 +339,7 @@ class XsAuto():
         self.speed = speed
         self.least_member = least_member
         self.value = value
+        self.battle_time = time.clock()
         self.guanqiaToindex = {'xyg':0,'wjsz':1,'wrg':2,'mysz':3}
         self.cls_path = "./digits_ymjh3.pkl"
         self.clf,self.pp = joblib.load(self.cls_path)
@@ -388,46 +391,47 @@ class XsAuto():
         position = function_ark.pic_position(self.handle, config_ark.pic_confirm['create_team'], 0.8, once=1)
         if position != None:
             function_ark.mouse_click(self.handle, ymjh_point(position['result']))
-            # 选择江湖纪事
-            position = function_ark.pic_position(self.handle, config_ark.pic_confirm['target'], 0.8,
-                                                 once=2)
-            if position != None:
-                function_ark.mouse_click(self.handle, ymjh_point(position["result"]))
-                cnt1 = 0
-                while (1):
-                    position = function_ark.pic_position(self.handle, config_ark.pic_confirm['jhjs'],
-                                                         once=2)
-                    if position != None:
-                        function_ark.mouse_click(self.handle, ymjh_point(position["result"]))
-                        cnt = 0
-                        while (1):
-                            position = function_ark.pic_position(self.handle, config_ark.pic_confirm[guanqia],thresh=0.8,
-                                                                 once=1)
-                            if position != None:
-                                function_ark.mouse_click(self.handle, ymjh_point(position["result"]))
-                                # 对应关卡选择
-                                position = function_ark.pic_position(self.handle,
-                                                                     config_ark.pic_confirm["pp_confirm"], once=1)
-                                if position != None:
-                                    function_ark.mouse_click(self.handle, ymjh_point(position["result"]))
-                                    print("选择关卡{}，进行队伍匹配".format(guanqia))
-                                    time.sleep(0.5)
-                                    # position = function_ark.pic_position(self.handle,
-                                    #                                      config_ark.pic_confirm["hanhua"],
-                                    #                                      once=1)
-                                    # if position != None:
-                                    #     function_ark.mouse_click(self.handle, ymjh_point(position["result"]))
-                                    #     print("发布匹配消息")
-                                    return True
-
-                            mouse_drag(self.handle, config_ark.points['drag_up'], 5)
-                            cnt += 1
-                            if cnt > 10:
-                                print("进入失败，重新进入战斗界面")
-                    mouse_drag(self.handle, config_ark.points['drag_up'], 5)
-                    cnt1 += 1
-                    if cnt1 > 10:
-                        print("进入jhjs失败，重新进入")
+            return True
+            # # 选择江湖纪事
+            # position = function_ark.pic_position(self.handle, config_ark.pic_confirm['target'], 0.8,
+            #                                      once=2)
+            # if position != None:
+            #     function_ark.mouse_click(self.handle, ymjh_point(position["result"]))
+            #     cnt1 = 0
+            #     while (1):
+            #         position = function_ark.pic_position(self.handle, config_ark.pic_confirm['jhjs'],
+            #                                              once=2)
+            #         if position != None:
+            #             function_ark.mouse_click(self.handle, ymjh_point(position["result"]))
+            #             cnt = 0
+            #             while (1):
+            #                 position = function_ark.pic_position(self.handle, config_ark.pic_confirm[guanqia],thresh=0.8,
+            #                                                      once=1)
+            #                 if position != None:
+            #                     function_ark.mouse_click(self.handle, ymjh_point(position["result"]))
+            #                     # 对应关卡选择
+            #                     position = function_ark.pic_position(self.handle,
+            #                                                          config_ark.pic_confirm["pp_confirm"], once=1)
+            #                     if position != None:
+            #                         function_ark.mouse_click(self.handle, ymjh_point(position["result"]))
+            #                         print("选择关卡{}，进行队伍匹配".format(guanqia))
+            #                         time.sleep(0.5)
+            #                         # position = function_ark.pic_position(self.handle,
+            #                         #                                      config_ark.pic_confirm["hanhua"],
+            #                         #                                      once=1)
+            #                         # if position != None:
+            #                         #     function_ark.mouse_click(self.handle, ymjh_point(position["result"]))
+            #                         #     print("发布匹配消息")
+            #                         return True
+            #
+            #                 mouse_drag(self.handle, config_ark.points['drag_up'], 5)
+            #                 cnt += 1
+            #                 if cnt > 10:
+            #                     print("进入失败，重新进入战斗界面")
+            #         mouse_drag(self.handle, config_ark.points['drag_up'], 5)
+            #         cnt1 += 1
+            #         if cnt1 > 10:
+            #             print("进入jhjs失败，重新进入")
     def total_process(self,q=False):
         try:
             i = self.find_where()
@@ -439,12 +443,16 @@ class XsAuto():
                     position = function_ark.pic_position(self.handle, config_ark.pic_confirm['callback'], 0.8, once=1)
                     if position != None:
                         function_ark.mouse_click(self.handle, ymjh_point(position['result']))
+                    position = function_ark.pic_position(self.handle, config_ark.pic_confirm['recall'], 0.8, once=1)
+                    if position != None:
+                        function_ark.mouse_click(self.handle, ymjh_point(position['result']))
                     function_ark.key_press(self.handle, 'T')
                     time.sleep(1)
                     if self.enter('xs'):
                         self.xs(self.xs_min,select=self.guanqia_list,speed=self.speed)
                         guanqia = self.enter_guanqia()
                         self.pipei(guanqia)
+                        self.battle_time = time.clock()
                         position = function_ark.pic_position(self.handle,config_ark.pic_confirm['fuben'],0.7,once=3)
                         if position != None:
                             function_ark.mouse_click(self.handle, position['result'])
@@ -459,6 +467,28 @@ class XsAuto():
                             time.sleep(1)
                         else:
                             pass
+                        time_now = time.clock()
+                        if time_now - self.battle_time >self.stuck_set:
+                            print("疑似卡死，退队重组,战斗时间{}".format(time_now-self.battle_time))
+                            position = function_ark.pic_position(self.handle, config_ark.pic_confirm['leave'], 0.8,
+                                                                 once=2)
+                            if position != None:
+                                function_ark.mouse_click(self.handle, position['result'])
+                                time.sleep(1)
+                                position = function_ark.pic_position(self.handle, config_ark.pic_confirm['confirm'],
+                                                                     0.8,
+                                                                     once=2)
+                                if position != None:
+                                    print("疑似卡死，副本结束，退出副本")
+                                    function_ark.mouse_click(self.handle, position['result'])
+                                    time.sleep(5)
+                                    # 退队重组
+                                    position = function_ark.pic_position(self.handle,
+                                                                         config_ark.pic_where['zhujiemian'], 0.8)
+                                    if position != None:
+                                        self.tiren('xyg')
+                                        i = 0
+                                        break
                         if dead:
                             #死亡退出副本
                             position = function_ark.pic_position(self.handle, config_ark.pic_confirm['dead'], 0.8,once=True)
@@ -603,7 +633,7 @@ class XsAuto():
             # cv2.waitKey()
             guanqia = _which(im_crop)
             if guanqia==False:
-                if order>self.xs_num or order>=3:
+                if order>self.xs_num or order>=2:
                     print("当前所接取的悬赏非副本关卡，自己动手丰衣足食")
                     raise config_ark.ExitError
                 else:
@@ -673,31 +703,31 @@ class XsAuto():
                                                                  once=1)
                             if position != None:
                                 print("当前不在副本进入npc附近，进入悬赏来进入副本")
-                                self.enter('xs')
-                                order = 0
-                                while (1):
-                                    im = prtsc(self.handle)
-                                    point1, point2, point3, point4 = config_ark.xuanshang_name[order]
-                                    im_crop = im.copy()[point2:point4, point1:point3, :]
-                                    # cv2.imshow("!23",im_crop)
-                                    # cv2.waitKey()
-                                    guanqia = _which(im_crop)
-                                    if guanqia == False:
-                                        if order > self.xs_num or order >= 3:
-                                            print("当前所接取的悬赏非副本关卡，自己动手丰衣足食")
-                                            raise config_ark.ExitError
+                                if self.enter('xs'):
+                                    order1 = 0
+                                    while (1):
+                                        im = prtsc(self.handle)
+                                        point1, point2, point3, point4 = config_ark.xuanshang_name[order1]
+                                        im_crop = im.copy()[point2:point4, point1:point3, :]
+                                        # cv2.imshow("!23",im_crop)
+                                        # cv2.waitKey()
+                                        guanqia = _which(im_crop)
+                                        if guanqia == False:
+                                            if order1 > self.xs_num or order1 >= 2:
+                                                print("当前所接取的悬赏非副本关卡，自己动手丰衣足食")
+                                                raise config_ark.ExitError
+                                            else:
+                                                order1 += 1
+                                                continue
                                         else:
-                                            order += 1
-                                            continue
-                                    else:
-                                        function_ark.mouse_click(self.handle, config_ark.xuanshang_take[order])
-                                        time.sleep(2)
-                                        position = function_ark.pic_position(self.handle,
-                                                                             config_ark.pic_confirm['xinxiu'])
-                                        if position != None:
-                                            function_ark.mouse_click(self.handle, position['result'])
-                                            time.sleep(8)
-                                            break
+                                            function_ark.mouse_click(self.handle, config_ark.xuanshang_take[order])
+                                            time.sleep(2)
+                                            position = function_ark.pic_position(self.handle,
+                                                                                 config_ark.pic_confirm['xinxiu'])
+                                            if position != None:
+                                                function_ark.mouse_click(self.handle, position['result'])
+                                                time.sleep(8)
+                                                break
                         elif position in ['fuben_enter']:
                             position = function_ark.pic_position(self.handle, config_ark.pic_confirm['xinxiu'],
                                                                  once=2)
@@ -719,7 +749,7 @@ class XsAuto():
         im_crop = im[point2 + 24:point4 + 24, point1 + 3:point3 + 3, :]
         thresh = [[60, 120], [40, 80], [40, 80]]  # RGB
         im_gray = cv2.cvtColor(im_crop.copy(), cv2.COLOR_BGR2GRAY)
-        im_thresh = threshhold(im_crop, thresh)
+        im_thresh = threshhold(im_crop.copy(), thresh)
         im_thresh = cv2.cvtColor(im_thresh.copy(), cv2.COLOR_BGR2GRAY)
         kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
         # im_dilated = cv2.dilate(im_thresh, (3, 3))
@@ -740,9 +770,11 @@ class XsAuto():
             nbr = self.clf.predict(roi_hog_fd)
             value_result = value_result * 10
             value_result += int(nbr[0])
-            # save_digits(roi,int(nbr[0]))
+            save_digits(roi,int(nbr[0]))
             # cv2.imshow("123",roi1)
             # cv2.waitKey()
+        save_digits(im_crop,"{}-origin".format(value_result))
+        save_digits(im_erode, "{}-erode".format(value_result))
         print(value_result)
         return True
 
@@ -949,65 +981,164 @@ class XsAuto():
                 if position != None:
                     function_ark.mouse_click(self.handle, ymjh_point(position["result"]))
                     cnt=0
-                    while (1):
-                        position = function_ark.pic_position(self.handle, config_ark.pic_confirm[guanqia],thresh=0.8,once=1)
-                        if position != None:
-                            function_ark.mouse_click(self.handle,ymjh_point(position["result"]))
-                            #对应关卡选择
-                            time.sleep(1)
-                            position = function_ark.pic_position(self.handle, config_ark.pic_confirm["pp_confirm"], once=1)
+                    time.sleep(1)
+                    tmp_position = function_ark.pic_position(self.handle,config_ark.pic_confirm['None'],0.8,once=True)
+                    if tmp_position != None:
+                        #没进江湖纪事
+                        cnt1 = 0
+                        while (1):
+                            position = function_ark.pic_position(self.handle, config_ark.pic_confirm['jhjs'],
+                                                                 once=2)
                             if position != None:
                                 function_ark.mouse_click(self.handle, ymjh_point(position["result"]))
-                                print("选择关卡{}，进行队伍匹配".format(guanqia))
-                                time.sleep(0.5)
-                                position = function_ark.pic_position(self.handle, config_ark.pic_confirm["hanhua"],
-                                                                     once=1)
+                                cnt = 0
+                                while (1):
+                                    position = function_ark.pic_position(self.handle, config_ark.pic_confirm[guanqia],
+                                                                         thresh=0.8,
+                                                                         once=1)
+                                    if position != None:
+                                        function_ark.mouse_click(self.handle, ymjh_point(position["result"]))
+                                        # 对应关卡选择
+                                        position = function_ark.pic_position(self.handle,
+                                                                             config_ark.pic_confirm["pp_confirm"],
+                                                                             once=1)
+                                        if position != None:
+                                            function_ark.mouse_click(self.handle, ymjh_point(position["result"]))
+                                            print("选择关卡{}，进行队伍匹配".format(guanqia))
+                                            time.sleep(0.5)
+                                            position = function_ark.pic_position(self.handle,
+                                                                                 config_ark.pic_confirm["hanhua"],
+                                                                                 once=1)
+                                            if position != None:
+                                                function_ark.mouse_click(self.handle, ymjh_point(position["result"]))
+                                                print("发布匹配消息")
+                                            while (1):
+                                                time.sleep(3)
+                                                position = function_ark.pic_position(self.handle,
+                                                                                     config_ark.pic_confirm["hanhua"],
+                                                                                     once=1)
+                                                if position != None:
+                                                    function_ark.mouse_click(self.handle,
+                                                                             ymjh_point(position["result"]))
+                                                    print("发布匹配消息")
+                                                tmp_position = function_ark.pic_position(self.handle,
+                                                                                         config_ark.pic_where['duiwu'])
+                                                if tmp_position != None:
+                                                    # 确保在队伍列表打开情况下进行人数判断
+                                                    position = function_ark.pic_position(self.handle,
+                                                                                         config_ark.pic_confirm[
+                                                                                             "member"],
+                                                                                         findall=True)
+                                                    num_nai = 0
+                                                    if self.num_nai[self.guanqiaToindex[guanqia]] > 0:
+                                                        position1 = function_ark.pic_position(self.handle,
+                                                                                              config_ark.pic_confirm[
+                                                                                                  "naima1"],
+                                                                                              findall=True)
+                                                        position2 = function_ark.pic_position(self.handle,
+                                                                                              config_ark.pic_confirm[
+                                                                                                  "naima2"],
+                                                                                              findall=True)
+                                                        num_nai = len(position1 + position2)
+                                                    if (5 - len(position)) >= self.least_member[
+                                                        self.guanqiaToindex[guanqia]]:
+                                                        if num_nai >= self.num_nai[self.guanqiaToindex[guanqia]]:
+                                                            function_ark.key_press(self.handle, 'T')
+                                                            print("人员齐全，当前队伍成员数量：{},奶妈{}只".format(5 - len(position),
+                                                                                                  num_nai))
+                                                            return True
+                                                        elif len(position) == 0:
+                                                            function_ark.mouse_click(self.handle,
+                                                                                     config_ark.duiwu_pos[4])
+                                                            position = function_ark.pic_position(self.handle,
+                                                                                                 config_ark.pic_confirm[
+                                                                                                     'chuairen'],
+                                                                                                 0.8,
+                                                                                                 once=10)
+                                                            if position != None:
+                                                                function_ark.mouse_click(self.handle,
+                                                                                         ymjh_point(position["result"]))
+                                                                print("踢掉最后一名队员，寻找奶妈")
+
+                                                    else:
+                                                        print(
+                                                            "等待队员中，当前队伍成员：{}人,奶妈{}只".format(5 - len(position), num_nai))
+
+                                    mouse_drag(self.handle, config_ark.points['drag_up'], 5)
+                                    cnt += 1
+                                    if cnt > 10:
+                                        print("进入失败，重新进入战斗界面")
+                            mouse_drag(self.handle, config_ark.points['drag_up'], 5)
+                            cnt1 += 1
+                            if cnt1 > 10:
+                                print("进入jhjs失败，重新进入")
+                    else:
+                        while (1):
+                            position = function_ark.pic_position(self.handle, config_ark.pic_confirm[guanqia],thresh=0.8,once=1)
+                            if position != None:
+                                function_ark.mouse_click(self.handle,ymjh_point(position["result"]))
+                                #对应关卡选择
+                                time.sleep(1)
+                                position = function_ark.pic_position(self.handle, config_ark.pic_confirm["pp_confirm"], once=1)
                                 if position != None:
                                     function_ark.mouse_click(self.handle, ymjh_point(position["result"]))
-                                    print("发布匹配消息")
-                                while(1):
-                                    time.sleep(3)
+                                    print("选择关卡{}，进行队伍匹配".format(guanqia))
+                                    time.sleep(0.5)
                                     position = function_ark.pic_position(self.handle, config_ark.pic_confirm["hanhua"],
                                                                          once=1)
                                     if position != None:
                                         function_ark.mouse_click(self.handle, ymjh_point(position["result"]))
                                         print("发布匹配消息")
-                                    tmp_position = function_ark.pic_position(self.handle, config_ark.pic_where['duiwu'])
-                                    if tmp_position != None:
-                                    # 确保在队伍列表打开情况下进行人数判断
-                                        position = function_ark.pic_position(self.handle, config_ark.pic_confirm["member"],findall=True)
-                                        num_nai = 0
-                                        if self.num_nai[self.guanqiaToindex[guanqia]] > 0:
-                                            position1 = function_ark.pic_position(self.handle,
-                                                                                  config_ark.pic_confirm["naima1"],
-                                                                                  findall=True)
-                                            position2 = function_ark.pic_position(self.handle,
-                                                                                  config_ark.pic_confirm["naima2"],
-                                                                                  findall=True)
-                                            num_nai = len(position1 + position2)
-                                        if (5 - len(position)) >= self.least_member[self.guanqiaToindex[guanqia]]:
-                                            if num_nai >= self.num_nai[self.guanqiaToindex[guanqia]]:
-                                                function_ark.key_press(self.handle, 'T')
-                                                print("人员齐全，当前队伍成员数量：{},奶妈{}只".format(5 - len(position), num_nai))
-                                                return True
-                                            elif len(position) == 0:
-                                                function_ark.mouse_click(self.handle, config_ark.duiwu_pos[4])
-                                                position = function_ark.pic_position(self.handle,
-                                                                                     config_ark.pic_confirm['chuairen'],
-                                                                                     0.8,
-                                                                                     once=10)
-                                                if position != None:
-                                                    function_ark.mouse_click(self.handle, ymjh_point(position["result"]))
-                                                    print("踢掉最后一名队员，寻找奶妈")
+                                    while (1):
+                                        time.sleep(3)
+                                        position = function_ark.pic_position(self.handle,
+                                                                             config_ark.pic_confirm["hanhua"],
+                                                                             once=1)
+                                        if position != None:
+                                            function_ark.mouse_click(self.handle, ymjh_point(position["result"]))
+                                            print("发布匹配消息")
+                                        tmp_position = function_ark.pic_position(self.handle,
+                                                                                 config_ark.pic_where['duiwu'])
+                                        if tmp_position != None:
+                                            # 确保在队伍列表打开情况下进行人数判断
+                                            position = function_ark.pic_position(self.handle,
+                                                                                 config_ark.pic_confirm["member"],
+                                                                                 findall=True)
+                                            num_nai = 0
+                                            if self.num_nai[self.guanqiaToindex[guanqia]] > 0:
+                                                position1 = function_ark.pic_position(self.handle,
+                                                                                      config_ark.pic_confirm["naima1"],
+                                                                                      findall=True)
+                                                position2 = function_ark.pic_position(self.handle,
+                                                                                      config_ark.pic_confirm["naima2"],
+                                                                                      findall=True)
+                                                num_nai = len(position1 + position2)
+                                            if (5 - len(position)) >= self.least_member[self.guanqiaToindex[guanqia]]:
+                                                if num_nai >= self.num_nai[self.guanqiaToindex[guanqia]]:
+                                                    function_ark.key_press(self.handle, 'T')
+                                                    print("人员齐全，当前队伍成员数量：{},奶妈{}只".format(5 - len(position), num_nai))
+                                                    return True
+                                                elif len(position) == 0:
+                                                    function_ark.mouse_click(self.handle, config_ark.duiwu_pos[4])
+                                                    position = function_ark.pic_position(self.handle,
+                                                                                         config_ark.pic_confirm[
+                                                                                             'chuairen'],
+                                                                                         0.8,
+                                                                                         once=10)
+                                                    if position != None:
+                                                        function_ark.mouse_click(self.handle,
+                                                                                 ymjh_point(position["result"]))
+                                                        print("踢掉最后一名队员，寻找奶妈")
 
-                                        else:
-                                            print("等待队员中，当前队伍成员：{}人,奶妈{}只".format(5 - len(position), num_nai))
+                                            else:
+                                                print("等待队员中，当前队伍成员：{}人,奶妈{}只".format(5 - len(position), num_nai))
 
-                        mouse_drag(self.handle, config_ark.points['drag_up'],5)
-                        cnt += 1
-                        if cnt > 30:
-                            print("进入失败")
-                            raise config_ark.ExitError
+                            mouse_drag(self.handle, config_ark.points['drag_up'],5)
+                            cnt += 1
+                            if cnt > 30:
+                                print("进入失败")
+                                raise config_ark.ExitError
+
         return False
         # mouse_click(handle, position["result"])
         # print("进入{}".format(sub_class))
@@ -1297,14 +1428,18 @@ if __name__ == "__main__":
     handle = get_handle([1280,720],0)                         #获取模拟器窗体句柄
 
     config_ark.pic_load_ram()
-    position = function_ark.judge_where(handle, 10)
+    # while(1):
+    #     position = function_ark.pic_position(handle,config_ark.pic_confirm['confirm'],thresh=0.8,once=True)
+    #     if position!=None:
+    #         function_ark.mouse_click(handle,ymjh_point(position['result']))
+    #         time.sleep(0.05)
     # im = prtsc(handle)
     # point11, point22, point33, point44 = config_ark.xuanshang_name[2]
     # im_crop1 = im[point22:point44, point11:point33, :]
     # guanqia = _which(im_crop1)
     # cv2.imshow("!@3",im_crop1)
     # cv2.waitKey()
-    tmp_class = XsAuto(handle,0.1,['xyg','mysz'],num=0)
+    tmp_class = XsAuto(handle,0.1,['xyg','mysz'],num=0,least_member=1)
     tmp_class.pipei('mysz')
     tmp_class.total_process()
     # caiji(handle,8)

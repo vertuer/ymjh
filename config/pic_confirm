@@ -70,4 +70,6 @@ naima1 ./ark_images/processed\naima1.png 1340 779
 naima2 ./ark_images/processed\naima2.png 1340 779
 chuairen ./ark_images/processed\chuairen.png 1340 779
 dead ./ark_images/processed\dead.png 1340 779
+recall ./ark_images/processed\recall.png 1340 779
+None ./ark_images/processed\None.png 1340 779
 

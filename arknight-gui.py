@@ -153,98 +153,99 @@ class BaiTan():
         im = prtsc(self.handle)
         last_money = self.get_bag_money(im)
         while (1):
-            position = function_ark.pic_position(self.handle, config_ark.pic_confirm['guanzhu'],
-                                                 once=True)
-            if position != None:
-                function_ark.mouse_click(self.handle, ymjh_point(position['result']))
-                time.sleep(time_sleep)
+
                 for index, i in enumerate(self.item_num):
                     if self.bought_num[index] >= i:
                         pass
                     else:
-                        im = prtsc(self.handle)
-                        result = self.get_item_num(im, index)
-                        if result != 0:
-                            function_ark.mouse_click(self.handle, config_ark.item_pos[index])
-                            position = function_ark.pic_position(self.handle, config_ark.pic_confirm['return'],
-                                                                 once=10,time_sleep=0.1)
-                            if position != None:
-                                function_ark.mouse_click(self.handle, config_ark.item_pos[0])
-                                position = function_ark.pic_position(self.handle, config_ark.pic_confirm['buy'],
-                                                                     once=10, time_sleep=0.1)
-                                if position != None:
-                                    time.sleep(time_sleep)
-                                    # whether to buy multiple items
-                                    if self.rec:
-                                        im = prtsc(self.handle)
-                                        price = self.get_item_price(im)
-                                    else:
-                                        self.unit_price = [1 for i in range(6)]
-                                        price = 1
-                                    if self.unit_price[index] >= price and price > 0:
-                                        # 可以购买 选择最大购买数目
-                                        if self.multiple:
-                                            function_ark.mouse_click(self.handle,config_ark.points['num'])
-                                            time.sleep(0.02)
-                                            function_ark.mouse_click(self.handle,config_ark.points['9'])
-                                            time.sleep(0.01)
-                                            function_ark.mouse_click(self.handle,config_ark.points['9'])
-                                            time.sleep(0.01)
-                                            function_ark.mouse_click(self.handle, ymjh_point(position['result']))
-                                        time.sleep(0.02)
-                                        function_ark.mouse_click(self.handle, ymjh_point(position['result']))
-                                        time.sleep(time_sleep)
-                                        function_ark.mouse_click(self.handle, config_ark.points['confirm'])
-                                        if self.rec:
-                                            time.sleep(5)
-                                            im = prtsc(self.handle)
-                                            cur_money = self.get_bag_money(im)
-                                            bought = (last_money - cur_money) / price
-                                            last_money = cur_money
-                                            if bought > 0:
-                                                print("购买物品{},{}个，价值单价{}".format(index, bought, price))
-                                                self.bought_num[index] += bought
-                                                if index == 0:
-                                                    baitan.static16.SetLabel("{}".format(self.bought_num[index]))
-                                                elif index == 1:
-                                                    baitan.static26.SetLabel("{}".format(self.bought_num[index]))
-                                                elif index == 2:
-                                                    baitan.static36.SetLabel("{}".format(self.bought_num[index]))
-                                                elif index == 3:
-                                                    baitan.static46.SetLabel("{}".format(self.bought_num[index]))
-                                                elif index == 4:
-                                                    baitan.static56.SetLabel("{}".format(self.bought_num[index]))
-                                                elif index == 5:
-                                                    baitan.static66.SetLabel("{}".format(self.bought_num[index]))
-                                    else:
-                                        position = function_ark.pic_position(self.handle, config_ark.pic_confirm['cancel'],
-                                                                             once=2)
-                                        if position != None:
-                                            function_ark.mouse_click(self.handle, ymjh_point(position['result']))
-                                            time.sleep(0.5)
-                                            print("物品价值{}，超出设定单价{}，不购买".format(price, self.unit_price[index]))
-
-                        continue
-            else:
-                cnt +=1
-                if cnt ==20:
-                    cnt = 0
-                    position = function_ark.pic_position(self.handle, config_ark.pic_confirm['zbg'],
-                                                         once=True)
-                    if position != None:
-                        function_ark.mouse_click(self.handle,ymjh_point(position['result']))
-                        print("意外退出，重新进入珍宝阁")
-                        time.sleep(2)
-                        continue
-                    position = function_ark.pic_position(self.handle, config_ark.pic_confirm['buy'],
-                                                         once=True)
-                    if position != None:
-                        position = function_ark.pic_position(self.handle, config_ark.pic_confirm['cancel'],
+                        position = function_ark.pic_position(self.handle, config_ark.pic_confirm['guanzhu'],
                                                              once=True)
                         if position != None:
                             function_ark.mouse_click(self.handle, ymjh_point(position['result']))
-                            print('卡在购买界面，点击取消')
-                            time.sleep(2)
+                            time.sleep(time_sleep)
+                            im = prtsc(self.handle)
+                            result = self.get_item_num(im, index)
+                            if result != 0:
+                                function_ark.mouse_click(self.handle, config_ark.item_pos[index])
+                                position = function_ark.pic_position(self.handle, config_ark.pic_confirm['return'],
+                                                                     once=10,time_sleep=0.1)
+                                if position != None:
+                                    function_ark.mouse_click(self.handle, config_ark.item_pos[0])
+                                    position = function_ark.pic_position(self.handle, config_ark.pic_confirm['buy'],
+                                                                         once=10, time_sleep=0.1)
+                                    if position != None:
+                                        time.sleep(time_sleep)
+                                        # whether to buy multiple items
+                                        if self.rec:
+                                            im = prtsc(self.handle)
+                                            price = self.get_item_price(im)
+                                        else:
+                                            self.unit_price = [1 for j in range(6)]
+                                            price = 1
+                                        if self.unit_price[index] >= price and price > 0:
+                                            # 可以购买 选择最大购买数目
+                                            if self.multiple:
+                                                function_ark.mouse_click(self.handle,config_ark.points['num'])
+                                                time.sleep(0.05)
+                                                function_ark.mouse_click(self.handle,config_ark.points['9'])
+                                                time.sleep(0.03)
+                                                function_ark.mouse_click(self.handle,config_ark.points['9'])
+                                                time.sleep(0.03)
+                                                function_ark.mouse_click(self.handle, ymjh_point(position['result']))
+                                            time.sleep(0.02)
+                                            function_ark.mouse_click(self.handle, ymjh_point(position['result']))
+                                            time.sleep(time_sleep)
+                                            function_ark.mouse_click(self.handle, config_ark.points['confirm'])
+                                            if self.rec:
+                                                time.sleep(5)
+                                                im = prtsc(self.handle)
+                                                cur_money = self.get_bag_money(im)
+                                                bought = (last_money - cur_money) / price
+                                                last_money = cur_money
+                                                if bought > 0:
+                                                    print("购买物品{},{}个，价值单价{}".format(index, bought, price))
+                                                    self.bought_num[index] += bought
+                                                    if index == 0:
+                                                        baitan.static16.SetLabel("{}".format(self.bought_num[index]))
+                                                    elif index == 1:
+                                                        baitan.static26.SetLabel("{}".format(self.bought_num[index]))
+                                                    elif index == 2:
+                                                        baitan.static36.SetLabel("{}".format(self.bought_num[index]))
+                                                    elif index == 3:
+                                                        baitan.static46.SetLabel("{}".format(self.bought_num[index]))
+                                                    elif index == 4:
+                                                        baitan.static56.SetLabel("{}".format(self.bought_num[index]))
+                                                    elif index == 5:
+                                                        baitan.static66.SetLabel("{}".format(self.bought_num[index]))
+                                        else:
+                                            position = function_ark.pic_position(self.handle, config_ark.pic_confirm['cancel'],
+                                                                                 once=2)
+                                            if position != None:
+                                                function_ark.mouse_click(self.handle, ymjh_point(position['result']))
+                                                time.sleep(0.5)
+                                                print("物品价值{}，超出设定单价{}，不购买".format(price, self.unit_price[index]))
+
+                            continue
+                        else:
+                            cnt += 1
+                            if cnt == 20:
+                                cnt = 0
+                                position = function_ark.pic_position(self.handle, config_ark.pic_confirm['zbg'],
+                                                                     once=True)
+                                if position != None:
+                                    function_ark.mouse_click(self.handle, ymjh_point(position['result']))
+                                    print("意外退出，重新进入珍宝阁")
+                                    time.sleep(2)
+                                    continue
+                                position = function_ark.pic_position(self.handle, config_ark.pic_confirm['buy'],
+                                                                     once=True)
+                                if position != None:
+                                    position = function_ark.pic_position(self.handle, config_ark.pic_confirm['cancel'],
+                                                                         once=True)
+                                    if position != None:
+                                        function_ark.mouse_click(self.handle, ymjh_point(position['result']))
+                                        print('卡在购买界面，点击取消')
+                                        time.sleep(2)
 
 class RedirectText(object):
     def __init__(self,aWxTextCtrl):
